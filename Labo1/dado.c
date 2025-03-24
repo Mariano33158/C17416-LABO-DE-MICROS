@@ -1,13 +1,16 @@
+// Mariano Segura Chaves C17416
+// Laboratorio 1
+
 #include <pic14/pic12f683.h>  // Biblioteca para SDCC y PIC12F683
 #define _XTAL_FREQ 4000000   // Oscilador a 4 MHz
 
-// Definir pines para LEDs
+// Definir pines para LEDs que encienden cada conjunto de leds
 #define LED0 GP0
 #define LED1 GP1
 #define LED2 GP2
 #define LED4 GP4
 
-// Definir botón en GP5
+// Definir botón que acciona la tirada del dado en GP5
 #define BOTON GP5
 
 void initPIC(void);
@@ -15,7 +18,7 @@ void mostrarDado(unsigned char numero);
 void delay_ms(unsigned int tiempo);  // Retardo manual
 
 void main(void) {
-    initPIC();  // Configuración inicial del PIC
+    initPIC();  // Configuración inicial del PIC para que todo inicie en 0
     unsigned char dado = 0;
     unsigned char botonAnterior = 0;  // Para detectar flanco ascendente
     unsigned int contador = 0;      // Contador para número aleatorio
@@ -24,7 +27,7 @@ void main(void) {
         contador++;  // Incrementar contador continuamente
         delay_ms(1);  // Retardo manual de 1 ms
 
-        unsigned char botonActual = BOTON;  // Leer estado actual del botón
+        unsigned char botonActual = BOTON;  // Leer estado actual del botón para saber si empezar o no
 
         // Detectar flanco ascendente
         if (botonActual == 1 && botonAnterior == 0) { 
