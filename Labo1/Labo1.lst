@@ -1,6 +1,6 @@
 gplink-1.5.0 #1285 (Sep 12 2016)
 Copyright (c) 1998-2016 gputils project
-Listing File Generated: 3-22-2025  16:17:27
+Listing File Generated: 3-22-2025  16:57:55
 
 
 Address  Value    Disassembly              Source
@@ -28,6 +28,7 @@ Address  Value    Disassembly              Source
                                            ;--------------------------------------------------------
                                            ; external declarations
                                            ;--------------------------------------------------------
+                                           	extern	__moduint
                                            	extern	_ANSEL
                                            	extern	_TRISIO
                                            	extern	_CMCON0
@@ -39,6 +40,8 @@ Address  Value    Disassembly              Source
                                            ;--------------------------------------------------------
                                            	global	_main
                                            	global	_initPIC
+                                           	global	_mostrarDado
+                                           	global	_delay_ms
 
                                            	global PSAVE
                                            	global SSAVE
@@ -84,6 +87,20 @@ Address  Value    Disassembly              Source
                                            ;--------------------------------------------------------
                                            ; compiler-defined variables
                                            ;--------------------------------------------------------
+                                           UDL_dado_0	udata
+                                           r0x1007	res	1
+                                           r0x1008	res	1
+                                           r0x1009	res	1
+                                           r0x100A	res	1
+                                           r0x100C	res	1
+                                           r0x100D	res	1
+                                           r0x1006	res	1
+                                           r0x1001	res	1
+                                           r0x1000	res	1
+                                           r0x1002	res	1
+                                           r0x1003	res	1
+                                           r0x1004	res	1
+                                           r0x1005	res	1
                                            ;--------------------------------------------------------
                                            ; initialized data
                                            ;--------------------------------------------------------
@@ -111,32 +128,267 @@ Address  Value    Disassembly              Source
                                            ;has an exit
                                            ;functions called:
                                            ;   _initPIC
+                                           ;   _delay_ms
+                                           ;   __moduint
+                                           ;   _mostrarDado
                                            ;   _initPIC
+                                           ;   _delay_ms
+                                           ;   __moduint
+                                           ;   _mostrarDado
+                                           ;10 compiler assigned registers:
+                                           ;   r0x1007
+                                           ;   r0x1008
+                                           ;   r0x1009
+                                           ;   STK00
+                                           ;   r0x100A
+                                           ;   STK02
+                                           ;   STK01
+                                           ;   r0x100B
+                                           ;   r0x100C
+                                           ;   r0x100D
                                            ;; Starting pCode block
                                            S_dado__main	code
                                            _main:
                                            ; 2 exit points
-                                           ;	.line	16; "dado.c"	initPIC();  // Configuración inicial del PIC
+                                           ;	.line	18; "dado.c"	initPIC();  // Configuración inicial del PIC
                                            	PAGESEL	_initPIC
-0000d2   20dd     call    0x00dd           	CALL	_initPIC
+000156   21aa     call    0x01aa           	CALL	_initPIC
                                            	PAGESEL	$
+                                           ;	.line	20; "dado.c"	unsigned char botonAnterior = 0;  // Para detectar flanco ascendente
+000157   1683     bsf     0x03, 0x5        	BANKSEL	r0x1007
+000158   01a0     clrf    0x20             	CLRF	r0x1007
+                                           ;	.line	23; "dado.c"	while (1) {
+000159   01a1     clrf    0x21             	CLRF	r0x1008
+00015a   01a2     clrf    0x22             	CLRF	r0x1009
                                            _00109_DS_:
-                                           ;	.line	19; "dado.c"	if (BOTON == 0) {  // Botón presionado (activo bajo)
-0000d3   1283     bcf     0x03, 0x5        	BANKSEL	_GPIObits
-0000d4   1a85     btfsc   0x05, 0x5        	BTFSC	_GPIObits,5
-0000d5   28d9     goto    0x00d9           	GOTO	_00106_DS_
-                                           ;	.line	20; "dado.c"	GPIO = 0b00010111;  // Encender LEDs GP0, GP1, GP2 y GP4
-0000d6   3017     movlw   0x17             	MOVLW	0x17
-0000d7   0085     movwf   0x05             	MOVWF	_GPIO
-0000d8   28d3     goto    0x00d3           	GOTO	_00109_DS_
+                                           ;	.line	24; "dado.c"	contador++;  // Incrementar contador continuamente
+00015b   1683     bsf     0x03, 0x5        	BANKSEL	r0x1008
+00015c   0aa1     incf    0x21, 0x1        	INCF	r0x1008,F
+00015d   1903     btfsc   0x03, 0x2        	BTFSC	STATUS,2
+00015e   0aa2     incf    0x22, 0x1        	INCF	r0x1009,F
+                                           ;	.line	25; "dado.c"	delay_ms(1);  // Retardo manual de 1 ms
+00015f   3001     movlw   0x01             	MOVLW	0x01
+000160   00ff     movwf   0x7f             	MOVWF	STK00
+000161   3000     movlw   0x00             	MOVLW	0x00
+                                           	PAGESEL	_delay_ms
+000162   2187     call    0x0187           	CALL	_delay_ms
+                                           	PAGESEL	$
+                                           ;	.line	27; "dado.c"	unsigned char botonActual = BOTON;  // Leer estado actual del botón
+000163   1683     bsf     0x03, 0x5        	BANKSEL	r0x100A
+000164   01a3     clrf    0x23             	CLRF	r0x100A
+000165   1283     bcf     0x03, 0x5        	BANKSEL	_GPIObits
+000166   1e85     btfss   0x05, 0x5        	BTFSS	_GPIObits,5
+000167   296a     goto    0x016a           	GOTO	_00002_DS_
+000168   1683     bsf     0x03, 0x5        	BANKSEL	r0x100A
+000169   0aa3     incf    0x23, 0x1        	INCF	r0x100A,F
+                                           _00002_DS_:
+                                           ;	.line	30; "dado.c"	if (botonActual == 1 && botonAnterior == 0) { 
+00016a   1683     bsf     0x03, 0x5        	BANKSEL	r0x100A
+00016b   0823     movf    0x23, 0x0        	MOVF	r0x100A,W
+00016c   3a01     xorlw   0x01             	XORLW	0x01
+00016d   1d03     btfss   0x03, 0x2        	BTFSS	STATUS,2
+00016e   2982     goto    0x0182           	GOTO	_00106_DS_
+00016f   0820     movf    0x20, 0x0        	MOVF	r0x1007,W
+000170   1d03     btfss   0x03, 0x2        	BTFSS	STATUS,2
+000171   2982     goto    0x0182           	GOTO	_00106_DS_
+                                           ;	.line	32; "dado.c"	dado = (contador % 6) + 1;
+000172   3006     movlw   0x06             	MOVLW	0x06
+000173   00fd     movwf   0x7d             	MOVWF	STK02
+000174   3000     movlw   0x00             	MOVLW	0x00
+000175   00fe     movwf   0x7e             	MOVWF	STK01
+000176   0821     movf    0x21, 0x0        	MOVF	r0x1008,W
+000177   00ff     movwf   0x7f             	MOVWF	STK00
+000178   0822     movf    0x22, 0x0        	MOVF	r0x1009,W
+                                           	PAGESEL	__moduint
+000179   209e     call    0x009e           	CALL	__moduint
+                                           	PAGESEL	$
+                                           ;;1	MOVWF	r0x100B
+00017a   087f     movf    0x7f, 0x0        	MOVF	STK00,W
+00017b   1683     bsf     0x03, 0x5        	BANKSEL	r0x100C
+00017c   00a4     movwf   0x24             	MOVWF	r0x100C
+00017d   00a5     movwf   0x25             	MOVWF	r0x100D
+00017e   00a4     movwf   0x24             	MOVWF	r0x100C
+00017f   0a24     incf    0x24, 0x0        	INCF	r0x100C,W
+                                           ;	.line	33; "dado.c"	mostrarDado(dado);  // Actualizar LEDs
+000180   00a5     movwf   0x25             	MOVWF	r0x100D
+                                           	PAGESEL	_mostrarDado
+000181   20eb     call    0x00eb           	CALL	_mostrarDado
+                                           	PAGESEL	$
                                            _00106_DS_:
-                                           ;	.line	22; "dado.c"	GPIO = 0x00;  // Apagar todos los LEDs
-0000d9   1283     bcf     0x03, 0x5        	BANKSEL	_GPIO
-0000da   0185     clrf    0x05             	CLRF	_GPIO
-0000db   28d3     goto    0x00d3           	GOTO	_00109_DS_
-                                           ;	.line	25; "dado.c"	}
-0000dc   0008     return                   	RETURN	
+                                           ;	.line	36; "dado.c"	botonAnterior = botonActual;  // Guardar estado actual
+000182   1683     bsf     0x03, 0x5        	BANKSEL	r0x100A
+000183   0823     movf    0x23, 0x0        	MOVF	r0x100A,W
+000184   00a0     movwf   0x20             	MOVWF	r0x1007
+000185   295b     goto    0x015b           	GOTO	_00109_DS_
+                                           ;	.line	38; "dado.c"	}
+000186   0008     return                   	RETURN	
                                            ; exit point of _main
+
+                                           ;***
+                                           ;  pBlock Stats: dbName = C
+                                           ;***
+                                           ;has an exit
+                                           ;7 compiler assigned registers:
+                                           ;   r0x1000
+                                           ;   STK00
+                                           ;   r0x1001
+                                           ;   r0x1002
+                                           ;   r0x1003
+                                           ;   r0x1004
+                                           ;   r0x1005
+                                           ;; Starting pCode block
+                                           S_dado__delay_ms	code
+                                           _delay_ms:
+                                           ; 2 exit points
+                                           ;	.line	81; "dado.c"	void delay_ms(unsigned int tiempo) {
+000187   1683     bsf     0x03, 0x5        	BANKSEL	r0x1000
+000188   00a8     movwf   0x28             	MOVWF	r0x1000
+000189   087f     movf    0x7f, 0x0        	MOVF	STK00,W
+00018a   00a7     movwf   0x27             	MOVWF	r0x1001
+                                           ;	.line	83; "dado.c"	for (i = 0; i < tiempo; i++) {
+00018b   01a9     clrf    0x29             	CLRF	r0x1002
+00018c   01aa     clrf    0x2a             	CLRF	r0x1003
+                                           _00152_DS_:
+00018d   1683     bsf     0x03, 0x5        	BANKSEL	r0x1000
+00018e   0828     movf    0x28, 0x0        	MOVF	r0x1000,W
+00018f   022a     subwf   0x2a, 0x0        	SUBWF	r0x1003,W
+000190   1d03     btfss   0x03, 0x2        	BTFSS	STATUS,2
+000191   2994     goto    0x0194           	GOTO	_00182_DS_
+000192   0827     movf    0x27, 0x0        	MOVF	r0x1001,W
+000193   0229     subwf   0x29, 0x0        	SUBWF	r0x1002,W
+                                           _00182_DS_:
+000194   1803     btfsc   0x03, 0x0        	BTFSC	STATUS,0
+000195   29a9     goto    0x01a9           	GOTO	_00154_DS_
+                                           ;;genSkipc:3307: created from rifx:000000cf3d3d8e30
+                                           ;	.line	84; "dado.c"	for (j = 0; j < 1000; j++) {
+000196   30e8     movlw   0xe8             	MOVLW	0xe8
+000197   1683     bsf     0x03, 0x5        	BANKSEL	r0x1004
+000198   00ab     movwf   0x2b             	MOVWF	r0x1004
+000199   3003     movlw   0x03             	MOVLW	0x03
+00019a   00ac     movwf   0x2c             	MOVWF	r0x1005
+                                           _00150_DS_:
+00019b   0000     nop                      	nop	
+00019c   30ff     movlw   0xff             	MOVLW	0xff
+00019d   1683     bsf     0x03, 0x5        	BANKSEL	r0x1004
+00019e   07ab     addwf   0x2b, 0x1        	ADDWF	r0x1004,F
+00019f   1c03     btfss   0x03, 0x0        	BTFSS	STATUS,0
+0001a0   03ac     decf    0x2c, 0x1        	DECF	r0x1005,F
+                                           ;	.line	84; "dado.c"	for (j = 0; j < 1000; j++) {
+0001a1   082c     movf    0x2c, 0x0        	MOVF	r0x1005,W
+0001a2   042b     iorwf   0x2b, 0x0        	IORWF	r0x1004,W
+0001a3   1d03     btfss   0x03, 0x2        	BTFSS	STATUS,2
+0001a4   299b     goto    0x019b           	GOTO	_00150_DS_
+                                           ;	.line	83; "dado.c"	for (i = 0; i < tiempo; i++) {
+0001a5   0aa9     incf    0x29, 0x1        	INCF	r0x1002,F
+0001a6   1903     btfsc   0x03, 0x2        	BTFSC	STATUS,2
+0001a7   0aaa     incf    0x2a, 0x1        	INCF	r0x1003,F
+0001a8   298d     goto    0x018d           	GOTO	_00152_DS_
+                                           _00154_DS_:
+                                           ;	.line	89; "dado.c"	}
+0001a9   0008     return                   	RETURN	
+                                           ; exit point of _delay_ms
+
+                                           ;***
+                                           ;  pBlock Stats: dbName = C
+                                           ;***
+                                           ;has an exit
+                                           ;1 compiler assigned register :
+                                           ;   r0x1006
+                                           ;; Starting pCode block
+                                           S_dado__mostrarDado	code
+                                           _mostrarDado:
+                                           ; 2 exit points
+                                           ;	.line	49; "dado.c"	void mostrarDado(unsigned char numero) {
+0000eb   1683     bsf     0x03, 0x5        	BANKSEL	r0x1006
+0000ec   00a6     movwf   0x26             	MOVWF	r0x1006
+                                           ;	.line	50; "dado.c"	GPIO = 0x00;  // Apagar LEDs antes de configurar
+0000ed   1283     bcf     0x03, 0x5        	BANKSEL	_GPIO
+0000ee   0185     clrf    0x05             	CLRF	_GPIO
+                                           ;;unsigned compare: left < lit(0x1=1), size=1
+                                           ;	.line	52; "dado.c"	switch (numero) {
+0000ef   3001     movlw   0x01             	MOVLW	0x01
+0000f0   1683     bsf     0x03, 0x5        	BANKSEL	r0x1006
+0000f1   0226     subwf   0x26, 0x0        	SUBWF	r0x1006,W
+0000f2   1c03     btfss   0x03, 0x0        	BTFSS	STATUS,0
+0000f3   2921     goto    0x0121           	GOTO	_00125_DS_
+                                           ;;genSkipc:3307: created from rifx:000000cf3d3d8e30
+                                           ;;swapping arguments (AOP_TYPEs 1/2)
+                                           ;;unsigned compare: left >= lit(0x7=7), size=1
+0000f4   3007     movlw   0x07             	MOVLW	0x07
+0000f5   0226     subwf   0x26, 0x0        	SUBWF	r0x1006,W
+0000f6   1803     btfsc   0x03, 0x0        	BTFSC	STATUS,0
+0000f7   2921     goto    0x0121           	GOTO	_00125_DS_
+                                           ;;genSkipc:3307: created from rifx:000000cf3d3d8e30
+0000f8   03a6     decf    0x26, 0x1        	DECF	r0x1006,F
+0000f9   3001     movlw   0x01             	MOVLW	HIGH(_00141_DS_)
+0000fa   1283     bcf     0x03, 0x5        	BANKSEL	PCLATH
+0000fb   008a     movwf   0x0a             	MOVWF	PCLATH
+0000fc   3004     movlw   0x04             	MOVLW	_00141_DS_
+0000fd   1683     bsf     0x03, 0x5        	BANKSEL	r0x1006
+0000fe   0726     addwf   0x26, 0x0        	ADDWF	r0x1006,W
+0000ff   1c03     btfss   0x03, 0x0        	BTFSS	STATUS,0
+000100   2903     goto    0x0103           	GOTO	_00001_DS_
+000101   1283     bcf     0x03, 0x5        	BANKSEL	PCLATH
+000102   0a8a     incf    0x0a, 0x1        	INCF	PCLATH,F
+                                           _00001_DS_:
+000103   0082     movwf   0x02             	MOVWF	PCL
+                                           _00141_DS_:
+000104   290a     goto    0x010a           	GOTO	_00118_DS_
+000105   290d     goto    0x010d           	GOTO	_00119_DS_
+000106   2910     goto    0x0110           	GOTO	_00120_DS_
+000107   2914     goto    0x0114           	GOTO	_00121_DS_
+000108   2918     goto    0x0118           	GOTO	_00122_DS_
+000109   291d     goto    0x011d           	GOTO	_00123_DS_
+                                           _00118_DS_:
+                                           ;	.line	54; "dado.c"	LED1 = 1;  // Número 1: GP1 encendido
+00010a   1283     bcf     0x03, 0x5        	BANKSEL	_GPIObits
+00010b   1485     bsf     0x05, 0x1        	BSF	_GPIObits,1
+                                           ;	.line	55; "dado.c"	break;
+00010c   2921     goto    0x0121           	GOTO	_00125_DS_
+                                           _00119_DS_:
+                                           ;	.line	57; "dado.c"	LED0 = 1;  // Número 2: GP0 encendido
+00010d   1283     bcf     0x03, 0x5        	BANKSEL	_GPIObits
+00010e   1405     bsf     0x05, 0x0        	BSF	_GPIObits,0
+                                           ;	.line	58; "dado.c"	break;
+00010f   2921     goto    0x0121           	GOTO	_00125_DS_
+                                           _00120_DS_:
+                                           ;	.line	60; "dado.c"	LED0 = 1;
+000110   1283     bcf     0x03, 0x5        	BANKSEL	_GPIObits
+000111   1405     bsf     0x05, 0x0        	BSF	_GPIObits,0
+                                           ;	.line	61; "dado.c"	LED1 = 1;  // Número 3: GP0 y GP1 encendidos
+000112   1485     bsf     0x05, 0x1        	BSF	_GPIObits,1
+                                           ;	.line	62; "dado.c"	break;
+000113   2921     goto    0x0121           	GOTO	_00125_DS_
+                                           _00121_DS_:
+                                           ;	.line	64; "dado.c"	LED0 = 1;
+000114   1283     bcf     0x03, 0x5        	BANKSEL	_GPIObits
+000115   1405     bsf     0x05, 0x0        	BSF	_GPIObits,0
+                                           ;	.line	65; "dado.c"	LED2 = 1;  // Número 4: GP0 y GP2 encendidos
+000116   1505     bsf     0x05, 0x2        	BSF	_GPIObits,2
+                                           ;	.line	66; "dado.c"	break;
+000117   2921     goto    0x0121           	GOTO	_00125_DS_
+                                           _00122_DS_:
+                                           ;	.line	68; "dado.c"	LED0 = 1;
+000118   1283     bcf     0x03, 0x5        	BANKSEL	_GPIObits
+000119   1405     bsf     0x05, 0x0        	BSF	_GPIObits,0
+                                           ;	.line	69; "dado.c"	LED1 = 1;
+00011a   1485     bsf     0x05, 0x1        	BSF	_GPIObits,1
+                                           ;	.line	70; "dado.c"	LED2 = 1;  // Número 5: GP0, GP1 y GP2 encendidos
+00011b   1505     bsf     0x05, 0x2        	BSF	_GPIObits,2
+                                           ;	.line	71; "dado.c"	break;
+00011c   2921     goto    0x0121           	GOTO	_00125_DS_
+                                           _00123_DS_:
+                                           ;	.line	73; "dado.c"	LED0 = 1;
+00011d   1283     bcf     0x03, 0x5        	BANKSEL	_GPIObits
+00011e   1405     bsf     0x05, 0x0        	BSF	_GPIObits,0
+                                           ;	.line	74; "dado.c"	LED2 = 1;
+00011f   1505     bsf     0x05, 0x2        	BSF	_GPIObits,2
+                                           ;	.line	75; "dado.c"	LED4 = 1;  // Número 6: GP0, GP2 y GP4 encendidos
+000120   1605     bsf     0x05, 0x4        	BSF	_GPIObits,4
+                                           _00125_DS_:
+                                           ;	.line	78; "dado.c"	}
+000121   0008     return                   	RETURN	
+                                           ; exit point of _mostrarDado
 
                                            ;***
                                            ;  pBlock Stats: dbName = C
@@ -146,24 +398,24 @@ Address  Value    Disassembly              Source
                                            S_dado__initPIC	code
                                            _initPIC:
                                            ; 2 exit points
-                                           ;	.line	29; "dado.c"	TRISIO = 0b00100000;  // GP5 como entrada, otros como salida
-0000dd   3020     movlw   0x20             	MOVLW	0x20
-0000de   1683     bsf     0x03, 0x5        	BANKSEL	_TRISIO
-0000df   0085     movwf   0x05             	MOVWF	_TRISIO
-                                           ;	.line	30; "dado.c"	ANSEL = 0x00;        // Desactivar entradas analógicas
-0000e0   019f     clrf    0x1f             	CLRF	_ANSEL
-                                           ;	.line	31; "dado.c"	CMCON0 = 0x07;       // Desactivar comparador
-0000e1   3007     movlw   0x07             	MOVLW	0x07
-0000e2   1283     bcf     0x03, 0x5        	BANKSEL	_CMCON0
-0000e3   0099     movwf   0x19             	MOVWF	_CMCON0
-                                           ;	.line	32; "dado.c"	GPIO = 0x00;         // Apagar LEDs
-0000e4   0185     clrf    0x05             	CLRF	_GPIO
-                                           ;	.line	33; "dado.c"	}
-0000e5   0008     return                   	RETURN	
+                                           ;	.line	42; "dado.c"	TRISIO = 0b00100000;  // GP5 como entrada, otros como salida
+0001aa   3020     movlw   0x20             	MOVLW	0x20
+0001ab   1683     bsf     0x03, 0x5        	BANKSEL	_TRISIO
+0001ac   0085     movwf   0x05             	MOVWF	_TRISIO
+                                           ;	.line	43; "dado.c"	ANSEL = 0x00;        // Desactivar entradas analógicas
+0001ad   019f     clrf    0x1f             	CLRF	_ANSEL
+                                           ;	.line	44; "dado.c"	CMCON0 = 0x07;       // Desactivar comparador
+0001ae   3007     movlw   0x07             	MOVLW	0x07
+0001af   1283     bcf     0x03, 0x5        	BANKSEL	_CMCON0
+0001b0   0099     movwf   0x19             	MOVWF	_CMCON0
+                                           ;	.line	45; "dado.c"	GPIO = 0x00;         // Apagar LEDs inicialmente
+0001b1   0185     clrf    0x05             	CLRF	_GPIO
+                                           ;	.line	46; "dado.c"	}
+0001b2   0008     return                   	RETURN	
                                            ; exit point of _initPIC
 
 
                                            ;	code size estimation:
-                                           ;	   16+    6 =    22 instructions (   56 byte)
+                                           ;	  121+   34 =   155 instructions (  378 byte)
 
                                            	end
